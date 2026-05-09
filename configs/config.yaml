@@ -1,10 +1,16 @@
 server:
     port: 50051
 
+metrics:
+    port: 9090
+
 limiter:
-    type: "sliding_window"
+    type: "hybrid"
     default_limit: 100
     default_window: 60s
+
+hybrid:
+    sync_interval: 500ms
 
 redis:
     address: "localhost:6379"

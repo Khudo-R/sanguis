@@ -13,7 +13,6 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 )
 
-// Re-implementing server for testing as the one in main is unexported
 type testServer struct {
 	pb.UnimplementedLimiterServer
 	limiter limiter.Limiter
@@ -42,7 +41,6 @@ func TestGRPCServer(t *testing.T) {
 	
 	go func() {
 		if err := s.Serve(lis); err != nil {
-			// Tests might have already finished
 		}
 	}()
 	defer s.Stop()
@@ -59,14 +57,12 @@ func TestGRPCServer(t *testing.T) {
 	
 	client := pb.NewLimiterClient(conn)
 
-	// Test Case: Basic Rate Limiting via gRPC
 	req := &pb.CheckRequest{
 		Key:      "grpc-test-key",
 		Limit:    2,
 		WindowWs: 1000,
 	}
 
-	// 1. First request
 	res, err := client.Check(ctx, req)
 	if err != nil {
 		t.Fatalf("Check failed: %v", err)
@@ -75,7 +71,6 @@ func TestGRPCServer(t *testing.T) {
 		t.Error("Expected first request to be allowed")
 	}
 
-	// 2. Second request
 	res, err = client.Check(ctx, req)
 	if err != nil {
 		t.Fatalf("Check failed: %v", err)
@@ -84,7 +79,6 @@ func TestGRPCServer(t *testing.T) {
 		t.Error("Expected second request to be allowed")
 	}
 
-	// 3. Third request (blocked)
 	res, err = client.Check(ctx, req)
 	if err != nil {
 		t.Fatalf("Check failed: %v", err)

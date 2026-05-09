@@ -11,12 +11,17 @@ type Config struct {
 	Server struct {
 		Port int `yaml:"port" env:"SERVER_PORT" env-default:"50051"`
 	} `yaml:"server"`
+	Metrics struct {
+		Port int `yaml:"port" env:"METRICS_PORT" env-default:"9090"`
+	} `yaml:"metrics"`
 	Limiter struct {
-		// Type of limiter: redis, sliding_window, token_bucket, memory
 		Type          string        `yaml:"type" env:"LIMITER_TYPE" env-default:"sliding_window"`
 		DefaultLimit  int           `yaml:"default_limit" env:"LIMITER_DEFAULT_LIMIT" env-default:"100"`
 		DefaultWindow time.Duration `yaml:"default_window" env:"LIMITER_DEFAULT_WINDOW" env-default:"60s"`
 	} `yaml:"limiter"`
+	Hybrid struct {
+		SyncInterval time.Duration `yaml:"sync_interval" env:"HYBRID_SYNC_INTERVAL" env-default:"500ms"`
+	} `yaml:"hybrid"`
 	Redis struct {
 		Address  string `yaml:"address" env:"REDIS_ADDRESS" env-default:"localhost:6379"`
 		Password string `yaml:"password" env:"REDIS_PASSWORD" env-default:""`

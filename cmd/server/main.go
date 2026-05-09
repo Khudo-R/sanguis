@@ -3,14 +3,19 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	pb "github.com/Khudo-R/sanguis/api/gen/v1"
 	"github.com/Khudo-R/sanguis/configs"
 	"github.com/Khudo-R/sanguis/internal/limiter"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
@@ -21,13 +26,10 @@ type server struct {
 
 func (s *server) Check(ctx context.Context, req *pb.CheckRequest) (*pb.CheckResponse, error) {
 	window := time.Duration(req.WindowWs) * time.Millisecond
-
 	res, err := s.limiter.Check(ctx, req.Key, int(req.Limit), window)
 	if err != nil {
 		return nil, err
 	}
-
-	log.Printf("Received check request for key: %s", req.Key)
 
 	return &pb.CheckResponse{
 		Allowed:   res.Allowed,
@@ -37,36 +39,64 @@ func (s *server) Check(ctx context.Context, req *pb.CheckRequest) (*pb.CheckResp
 }
 
 func main() {
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+	zap.ReplaceGlobals(logger)
+
 	cfg := configs.MustLoad("configs/config.yaml")
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Server.Port))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		logger.Fatal("failed to listen", zap.Error(err))
 	}
+
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     cfg.Redis.Address,
+		Password: cfg.Redis.Password,
+	})
 
 	var l limiter.Limiter
 	switch cfg.Limiter.Type {
 	case "redis":
-		rdb := redis.NewClient(&redis.Options{
-			Addr:     cfg.Redis.Address,
-			Password: cfg.Redis.Password,
-		})
 		l = limiter.NewRedisLimiter(rdb)
+	case "hybrid":
+		rl := limiter.NewRedisLimiter(rdb)
+		l = limiter.NewHybridLimiter(rl, cfg.Hybrid.SyncInterval, logger)
 	case "sliding_window":
 		l = limiter.NewSlidingWindowLimiter()
 	case "token_bucket":
 		l = limiter.NewTokenBucketLimiter()
 	default:
-		log.Printf("Unknown limiter type %s, falling back to memory", cfg.Limiter.Type)
 		l = limiter.NewInMemoryLimiter()
 	}
 
-	s := grpc.NewServer()
+	s := grpc.NewServer(
+		grpc.UnaryInterceptor(limiter.UnaryInterceptor(logger)),
+	)
 	pb.RegisterLimiterServer(s, &server{limiter: l})
 
-	log.Printf("server listening at %v with %s limiter", lis.Addr(), cfg.Limiter.Type)
+	go func() {
+		mux := http.NewServeMux()
+		mux.Handle("/metrics", promhttp.Handler())
+		logger.Info("metrics server starting", zap.Int("port", cfg.Metrics.Port))
+		if err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.Metrics.Port), mux); err != nil {
+			logger.Error("metrics server failed", zap.Error(err))
+		}
+	}()
 
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+	go func() {
+		logger.Info("gRPC server starting", zap.Int("port", cfg.Server.Port), zap.String("limiter", cfg.Limiter.Type))
+		if err := s.Serve(lis); err != nil {
+			logger.Fatal("gRPC server failed", zap.Error(err))
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+	<-quit
+
+	logger.Info("shutting down servers...")
+	s.GracefulStop()
+	rdb.Close()
+	logger.Info("shutdown complete")
 }

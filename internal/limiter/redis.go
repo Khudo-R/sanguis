@@ -24,7 +24,7 @@ func NewRedisLimiter(client *redis.Client) *RedisLimiter {
 }
 
 func (r *RedisLimiter) Check(ctx context.Context, key string, limit int, window time.Duration) (Result, error) {
-	res, err := r.script.Run(ctx, r.client, []string{key}, limit, window.Milliseconds()).Int64Slice()
+	res, err := r.script.Run(ctx, r.client, []string{key}, limit, window.Microseconds()).Int64Slice()
 	if err != nil {
 		return Result{}, err
 	}

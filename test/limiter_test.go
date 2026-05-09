@@ -13,11 +13,9 @@ import (
 func TestLimiters(t *testing.T) {
 	ctx := context.Background()
 
-	// Setup Redis client for testing
 	rdb := redis.NewClient(&redis.Options{
 		Addr: "localhost:6379",
 	})
-	// Check if Redis is reachable
 	redisAvailable := true
 	if err := rdb.Ping(ctx).Err(); err != nil {
 		redisAvailable = false
@@ -58,7 +56,6 @@ func TestLimiters(t *testing.T) {
 			limit := 5
 			window := 1 * time.Second
 
-			// 1. First 'limit' requests should be allowed
 			for i := 0; i < limit; i++ {
 				res, err := tc.limiter.Check(ctx, key, limit, window)
 				if err != nil {
@@ -69,7 +66,6 @@ func TestLimiters(t *testing.T) {
 				}
 			}
 
-			// 2. The next request should be blocked
 			res, err := tc.limiter.Check(ctx, key, limit, window)
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
@@ -78,13 +74,6 @@ func TestLimiters(t *testing.T) {
 				t.Error("expected request to be blocked")
 			}
 
-			// 3. Wait for the window to pass and check if it allows again
-			// Note: different limiters have different refill behaviors.
-			// Fixed window (Redis) and Memory (simple one) reset after window.
-			// Sliding window might need more time or specific timing.
-			// Token bucket refills continuously.
-			
-			// For simplicity in a unified test, let's wait a bit more than the window.
 			time.Sleep(window + 100*time.Millisecond)
 
 			res, err = tc.limiter.Check(ctx, key, limit, window)
