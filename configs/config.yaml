@@ -1,0 +1,10 @@
+server:
+    port: 50051
+
+limiter:
+    type: "sliding_window"
+    default_limit: 100
+    default_window: 60s
+
+redis:
+    address: "localhost:6379"

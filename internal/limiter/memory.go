@@ -6,14 +6,19 @@ import (
 	"time"
 )
 
+type entry struct {
+	count     int
+	expiresAt time.Time
+}
+
 type InMemoryLimiter struct {
 	mu     sync.Mutex
-	counts map[string]int
+	counts map[string]*entry
 }
 
 func NewInMemoryLimiter() *InMemoryLimiter {
 	return &InMemoryLimiter{
-		counts: make(map[string]int),
+		counts: make(map[string]*entry),
 	}
 }
 
@@ -21,21 +26,30 @@ func (l *InMemoryLimiter) Check(ctx context.Context, key string, limit int, wind
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
-	current := l.counts[key]
+	now := time.Now()
+	e, exists := l.counts[key]
 
-	if current >= limit {
+	if !exists || now.After(e.expiresAt) {
+		e = &entry{
+			count:     0,
+			expiresAt: now.Add(window),
+		}
+		l.counts[key] = e
+	}
+
+	if e.count >= limit {
 		return Result{
 			Allowed:   false,
 			Remaining: 0,
-			ResetTime: time.Now().Add(window),
+			ResetTime: e.expiresAt,
 		}, nil
 	}
 
-	l.counts[key]++
+	e.count++
 
 	return Result{
 		Allowed:   true,
-		Remaining: limit - current - 1,
-		ResetTime: time.Now().Add(window),
+		Remaining: limit - e.count,
+		ResetTime: e.expiresAt,
 	}, nil
 }

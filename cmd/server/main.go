@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"time"
 
 	pb "github.com/Khudo-R/sanguis/api/gen/v1"
+	"github.com/Khudo-R/sanguis/configs"
 	"github.com/Khudo-R/sanguis/internal/limiter"
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
@@ -35,20 +37,34 @@ func (s *server) Check(ctx context.Context, req *pb.CheckRequest) (*pb.CheckResp
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":50051")
+	cfg := configs.MustLoad("configs/config.yaml")
+
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Server.Port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
-	})
+	var l limiter.Limiter
+	switch cfg.Limiter.Type {
+	case "redis":
+		rdb := redis.NewClient(&redis.Options{
+			Addr:     cfg.Redis.Address,
+			Password: cfg.Redis.Password,
+		})
+		l = limiter.NewRedisLimiter(rdb)
+	case "sliding_window":
+		l = limiter.NewSlidingWindowLimiter()
+	case "token_bucket":
+		l = limiter.NewTokenBucketLimiter()
+	default:
+		log.Printf("Unknown limiter type %s, falling back to memory", cfg.Limiter.Type)
+		l = limiter.NewInMemoryLimiter()
+	}
 
-	l := limiter.NewRedisLimiter(rdb)
 	s := grpc.NewServer()
-
 	pb.RegisterLimiterServer(s, &server{limiter: l})
-	log.Printf("server listening at %v", lis.Addr())
+
+	log.Printf("server listening at %v with %s limiter", lis.Addr(), cfg.Limiter.Type)
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
