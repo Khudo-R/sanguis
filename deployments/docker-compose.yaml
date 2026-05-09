@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+    redis:
+        image: redis:7-alpine
+        ports:
+            - "6379:6379"
+    sanguis-server:
+        build:
+            context: . .
+            dockerfile: deployments/Dockerfile
+        ports:
+            - "50051:50051"
+        depends_on:
+            - redis
+        environment:
+            - REDIS_ADDR=redis:6379

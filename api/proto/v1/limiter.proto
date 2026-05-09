@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package limiter.v1;
+
+option go_package = "github.com/Khudo-R/sanguis/api/gen/v1;limiterv1";
+
+service Limiter {
+  rpc Check(CheckRequest) returns (CheckResponse);
+}
+
+message CheckRequest {
+  string key = 1;
+  int32 limit = 2;
+  int32 window_ws = 3;
+}
+
+message CheckResponse {
+  bool allowed = 1;
+  int32 remaining = 2;
+  int64 reset_time = 3;
+}
