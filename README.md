@@ -15,7 +15,7 @@ Sanguis is a high-performance, production-grade distributed rate limiter built w
 
 ## Tech Stack
 
-- **Language**: Go 1.22+
+- **Language**: Go 1.25+
 - **Communication**: gRPC
 - **Storage**: Redis
 - **Observability**: Prometheus & Zap
@@ -26,7 +26,7 @@ Sanguis is a high-performance, production-grade distributed rate limiter built w
 
 ### Prerequisites
 - Docker & Docker Compose
-- Go 1.22+ (for local development)
+- Go 1.25+ (for local development)
 
 ### Running with Docker Compose (Recommended)
 The easiest way to start the entire stack (Redis + Sanguis Server + Metrics):

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v3.19.6
-// source: v1/limiter.proto
+// source: api/proto/v1/limiter.proto
 
 package limiterv1
 
@@ -25,14 +25,14 @@ type CheckRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Key           string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	Limit         int32                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
-	WindowWs      int32                  `protobuf:"varint,3,opt,name=window_ws,json=windowWs,proto3" json:"window_ws,omitempty"`
+	WindowMs      int32                  `protobuf:"varint,3,opt,name=window_ms,json=windowMs,proto3" json:"window_ms,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CheckRequest) Reset() {
 	*x = CheckRequest{}
-	mi := &file_v1_limiter_proto_msgTypes[0]
+	mi := &file_api_proto_v1_limiter_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -44,7 +44,7 @@ func (x *CheckRequest) String() string {
 func (*CheckRequest) ProtoMessage() {}
 
 func (x *CheckRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_limiter_proto_msgTypes[0]
+	mi := &file_api_proto_v1_limiter_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -57,7 +57,7 @@ func (x *CheckRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckRequest.ProtoReflect.Descriptor instead.
 func (*CheckRequest) Descriptor() ([]byte, []int) {
-	return file_v1_limiter_proto_rawDescGZIP(), []int{0}
+	return file_api_proto_v1_limiter_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *CheckRequest) GetKey() string {
@@ -74,9 +74,9 @@ func (x *CheckRequest) GetLimit() int32 {
 	return 0
 }
 
-func (x *CheckRequest) GetWindowWs() int32 {
+func (x *CheckRequest) GetWindowMs() int32 {
 	if x != nil {
-		return x.WindowWs
+		return x.WindowMs
 	}
 	return 0
 }
@@ -92,7 +92,7 @@ type CheckResponse struct {
 
 func (x *CheckResponse) Reset() {
 	*x = CheckResponse{}
-	mi := &file_v1_limiter_proto_msgTypes[1]
+	mi := &file_api_proto_v1_limiter_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -104,7 +104,7 @@ func (x *CheckResponse) String() string {
 func (*CheckResponse) ProtoMessage() {}
 
 func (x *CheckResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_limiter_proto_msgTypes[1]
+	mi := &file_api_proto_v1_limiter_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -117,7 +117,7 @@ func (x *CheckResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckResponse.ProtoReflect.Descriptor instead.
 func (*CheckResponse) Descriptor() ([]byte, []int) {
-	return file_v1_limiter_proto_rawDescGZIP(), []int{1}
+	return file_api_proto_v1_limiter_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *CheckResponse) GetAllowed() bool {
@@ -141,16 +141,16 @@ func (x *CheckResponse) GetResetTime() int64 {
 	return 0
 }
 
-var File_v1_limiter_proto protoreflect.FileDescriptor
+var File_api_proto_v1_limiter_proto protoreflect.FileDescriptor
 
-const file_v1_limiter_proto_rawDesc = "" +
+const file_api_proto_v1_limiter_proto_rawDesc = "" +
 	"\n" +
-	"\x10v1/limiter.proto\x12\n" +
+	"\x1aapi/proto/v1/limiter.proto\x12\n" +
 	"limiter.v1\"S\n" +
 	"\fCheckRequest\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12\x1b\n" +
-	"\twindow_ws\x18\x03 \x01(\x05R\bwindowWs\"f\n" +
+	"\twindow_ms\x18\x03 \x01(\x05R\bwindowMs\"f\n" +
 	"\rCheckResponse\x12\x18\n" +
 	"\aallowed\x18\x01 \x01(\bR\aallowed\x12\x1c\n" +
 	"\tremaining\x18\x02 \x01(\x05R\tremaining\x12\x1d\n" +
@@ -160,23 +160,23 @@ const file_v1_limiter_proto_rawDesc = "" +
 	"\x05Check\x12\x18.limiter.v1.CheckRequest\x1a\x19.limiter.v1.CheckResponseB1Z/github.com/Khudo-R/sanguis/api/gen/v1;limiterv1b\x06proto3"
 
 var (
-	file_v1_limiter_proto_rawDescOnce sync.Once
-	file_v1_limiter_proto_rawDescData []byte
+	file_api_proto_v1_limiter_proto_rawDescOnce sync.Once
+	file_api_proto_v1_limiter_proto_rawDescData []byte
 )
 
-func file_v1_limiter_proto_rawDescGZIP() []byte {
-	file_v1_limiter_proto_rawDescOnce.Do(func() {
-		file_v1_limiter_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_v1_limiter_proto_rawDesc), len(file_v1_limiter_proto_rawDesc)))
+func file_api_proto_v1_limiter_proto_rawDescGZIP() []byte {
+	file_api_proto_v1_limiter_proto_rawDescOnce.Do(func() {
+		file_api_proto_v1_limiter_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_proto_v1_limiter_proto_rawDesc), len(file_api_proto_v1_limiter_proto_rawDesc)))
 	})
-	return file_v1_limiter_proto_rawDescData
+	return file_api_proto_v1_limiter_proto_rawDescData
 }
 
-var file_v1_limiter_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_v1_limiter_proto_goTypes = []any{
+var file_api_proto_v1_limiter_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_api_proto_v1_limiter_proto_goTypes = []any{
 	(*CheckRequest)(nil),  // 0: limiter.v1.CheckRequest
 	(*CheckResponse)(nil), // 1: limiter.v1.CheckResponse
 }
-var file_v1_limiter_proto_depIdxs = []int32{
+var file_api_proto_v1_limiter_proto_depIdxs = []int32{
 	0, // 0: limiter.v1.Limiter.Check:input_type -> limiter.v1.CheckRequest
 	1, // 1: limiter.v1.Limiter.Check:output_type -> limiter.v1.CheckResponse
 	1, // [1:2] is the sub-list for method output_type
@@ -186,26 +186,26 @@ var file_v1_limiter_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_v1_limiter_proto_init() }
-func file_v1_limiter_proto_init() {
-	if File_v1_limiter_proto != nil {
+func init() { file_api_proto_v1_limiter_proto_init() }
+func file_api_proto_v1_limiter_proto_init() {
+	if File_api_proto_v1_limiter_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_v1_limiter_proto_rawDesc), len(file_v1_limiter_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_proto_v1_limiter_proto_rawDesc), len(file_api_proto_v1_limiter_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_v1_limiter_proto_goTypes,
-		DependencyIndexes: file_v1_limiter_proto_depIdxs,
-		MessageInfos:      file_v1_limiter_proto_msgTypes,
+		GoTypes:           file_api_proto_v1_limiter_proto_goTypes,
+		DependencyIndexes: file_api_proto_v1_limiter_proto_depIdxs,
+		MessageInfos:      file_api_proto_v1_limiter_proto_msgTypes,
 	}.Build()
-	File_v1_limiter_proto = out.File
-	file_v1_limiter_proto_goTypes = nil
-	file_v1_limiter_proto_depIdxs = nil
+	File_api_proto_v1_limiter_proto = out.File
+	file_api_proto_v1_limiter_proto_goTypes = nil
+	file_api_proto_v1_limiter_proto_depIdxs = nil
 }

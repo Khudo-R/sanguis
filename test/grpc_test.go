@@ -19,7 +19,7 @@ type testServer struct {
 }
 
 func (s *testServer) Check(ctx context.Context, req *pb.CheckRequest) (*pb.CheckResponse, error) {
-	window := time.Duration(req.WindowWs) * time.Millisecond
+	window := time.Duration(req.WindowMs) * time.Millisecond
 	res, err := s.limiter.Check(ctx, req.Key, int(req.Limit), window)
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func TestGRPCServer(t *testing.T) {
 	req := &pb.CheckRequest{
 		Key:      "grpc-test-key",
 		Limit:    2,
-		WindowWs: 1000,
+		WindowMs: 1000,
 	}
 
 	res, err := client.Check(ctx, req)

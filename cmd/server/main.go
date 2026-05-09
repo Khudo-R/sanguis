@@ -25,7 +25,7 @@ type server struct {
 }
 
 func (s *server) Check(ctx context.Context, req *pb.CheckRequest) (*pb.CheckResponse, error) {
-	window := time.Duration(req.WindowWs) * time.Millisecond
+	window := time.Duration(req.WindowMs) * time.Millisecond
 	res, err := s.limiter.Check(ctx, req.Key, int(req.Limit), window)
 	if err != nil {
 		return nil, err

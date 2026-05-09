@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v3.19.6
-// source: v1/limiter.proto
+// source: api/proto/v1/limiter.proto
 
 package limiterv1
 
@@ -117,5 +117,5 @@ var Limiter_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "v1/limiter.proto",
+	Metadata: "api/proto/v1/limiter.proto",
 }
